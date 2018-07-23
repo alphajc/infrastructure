@@ -1,0 +1,36 @@
+---
+- name: Install nss-pam-ldapd
+  yum:
+    name: nss-pam-ldapd
+    state: present
+
+- name: Modify authconfig python version
+  shell: |
+    AUTHCONFIG=$(which authconfig)
+
+    sed -i -e '1i#!/usr/bin/python2.6' /usr/share/authconfig/authconfig.py
+    ln -sf /usr/share/authconfig/authconfig.py $AUTHCONFIG
+  args:
+    executable: /bin/bash
+
+- name: Setting LDAP client
+  shell: |
+    authconfig --enableshadow --enablemd5 \
+    --enableldap \
+    --enableldapauth \
+    --ldapserver={{ ldap_server }} \
+    --ldapbasedn="{{ basedn }}" \
+    {% if tls  %}
+    --enableldaptls \
+    {% endif %}
+    --enablecache \
+    --enablelocauthorize \
+    --enablemkhomedir \
+    --update
+  args:
+    executable: /bin/bash
+
+- name: Ensure the nslcd service is running
+  service:
+    name: nslcd
+    state: started

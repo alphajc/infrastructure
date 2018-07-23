@@ -1,0 +1,8 @@
+---
+- name: 配置所有能公网访问的机器
+  hosts: public
+  remote_user: root
+  gather_facts: no
+
+  roles:
+  - centos6

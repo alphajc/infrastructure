@@ -1,0 +1,125 @@
+; 深圳爱华
+[ah]
+120.78.237.205 ansible_user=root ansible_ssh_pass=Lw520310 ansible_python_interpreter=/usr/bin/python2.6
+39.108.77.159 ansible_user=root ansible_ssh_pass=Lw520310 ansible_python_interpreter=/usr/bin/python2.6
+119.23.167.235 ansible_user=root ansible_ssh_pass=Lw520310 ansible_python_interpreter=/usr/bin/python2.6
+120.78.238.222 ansible_user=root ansible_ssh_pass=Lw520310 ansible_python_interpreter=/usr/bin/python2.6
+120.78.239.223 ansible_user=root ansible_ssh_pass=Lw520310 ansible_python_interpreter=/usr/bin/python2.6
+120.78.240.167 ansible_user=root ansible_ssh_pass=Lw520310 ansible_python_interpreter=/usr/bin/python2.6
+120.78.237.240 ansible_user=root ansible_ssh_pass=Lw520310 ansible_python_interpreter=/usr/bin/python2.6
+119.23.224.31 ansible_user=root ansible_ssh_pass=Lw520310
+120.78.240.15 ansible_user=root ansible_ssh_pass=Lw520310
+120.78.237.52 ansible_user=root ansible_ssh_pass=Lw520310
+120.78.239.235 ansible_user=root ansible_ssh_pass=Lw520310
+
+; 上海侨外
+[qw]
+39.105.20.91 ansible_user=root ansible_ssh_pass=d39cHd30@xw8gd8 ansible_python_interpreter=/usr/bin/python2.6
+; 39.105.25.129 ansible_user=root ansible_ssh_pass=d39cHd30@xw8gd8 无法访问
+39.105.27.89 ansible_user=root ansible_ssh_pass=d39cHd30@xw8gd8 ansible_python_interpreter=/usr/bin/python2.6
+39.105.27.2 ansible_user=root ansible_ssh_pass=d39cHd30@xw8gd8 ansible_python_interpreter=/usr/bin/python2.6
+39.105.27.21 ansible_user=root ansible_ssh_pass=d39cHd30@xw8gd8 ansible_python_interpreter=/usr/bin/python2.6
+
+; 东软（一汽），仅内网
+[dr]
+10.7.201.43
+10.7.201.44
+10.7.201.45
+10.7.201.48
+
+; 爱轻科技，仅内网
+[aqkj]
+192.168.1.160
+192.168.1.161
+192.168.1.162
+
+; 易鑫西安，仅内网
+[yxxa]
+10.8.1.101
+10.8.1.102
+10.8.1.103
+10.8.1.104
+10.8.1.105
+10.8.1.106
+10.8.1.111
+10.8.1.112
+10.8.1.113
+10.8.1.114
+10.8.1.115
+10.8.1.116
+10.8.1.121
+10.8.1.122
+10.8.1.123
+10.8.1.5
+
+; 趣店，有访问控制
+[qd]
+47.98.242.36 ansible_user=add_tmp ansible_ssh_pass=2NF53dMFM8CF1n3w ansible_become=yes ansible_become_user=root
+47.96.123.196 ansible_user=add_tmp ansible_ssh_pass=2NF53dMFM8CF1n3w ansible_become=yes ansible_become_user=root
+47.96.121.114 ansible_user=add_tmp ansible_ssh_pass=2NF53dMFM8CF1n3w ansible_become=yes ansible_become_user=root ansible_python_interpreter=/usr/bin/python2.6
+47.96.89.124 ansible_user=add_tmp ansible_ssh_pass=2NF53dMFM8CF1n3w ansible_become=yes ansible_become_user=root ansible_python_interpreter=/usr/bin/python2.6
+47.96.120.142 ansible_user=add_tmp  ansible_ssh_pass=2NF53dMFM8CF1n3w ansible_become=yes ansible_become_user=root ansible_python_interpreter=/usr/bin/python2.6
+db1 ansible_host=120.55.48.189 ansible_port=50022 ansible_user=add_tmp  ansible_ssh_pass=2NF53dMFM8CF1n3w ansible_become=yes ansible_become_user=root ansible_python_interpreter=/usr/bin/python2.6
+db2 ansible_host=120.55.48.189 ansible_port=50023 ansible_user=add_tmp  ansible_ssh_pass=2NF53dMFM8CF1n3w ansible_become=yes ansible_become_user=root ansible_python_interpreter=/usr/bin/python2.6
+db3 ansible_host=120.55.48.189 ansible_port=50024 ansible_user=add_tmp  ansible_ssh_pass=2NF53dMFM8CF1n3w ansible_become=yes ansible_become_user=root ansible_python_interpreter=/usr/bin/python2.6
+
+; 四川电信
+[scdx]
+182.151.3.112 ansible_user=root ansible_ssh_pass=Cloud@18982129686 ansible_python_interpreter=/usr/bin/python2.6
+182.151.1.74 ansible_user=root ansible_ssh_pass=Cloud@18982129686 ansible_python_interpreter=/usr/bin/python2.6
+182.151.7.97 ansible_user=root ansible_ssh_pass=Cloud@18982129686 ansible_python_interpreter=/usr/bin/python2.6
+182.151.7.49 ansible_user=root ansible_ssh_pass=Cloud@18982129686 ansible_python_interpreter=/usr/bin/python2.6
+182.151.0.125 ansible_user=root ansible_ssh_pass=Cloud@18982129686 ansible_python_interpreter=/usr/bin/python2.6
+182.151.3.32 ansible_user=root ansible_ssh_pass=Cloud@18982129686 ansible_python_interpreter=/usr/bin/python2.6
+182.151.1.250 ansible_user=root ansible_ssh_pass=Cloud@18982129686 ansible_python_interpreter=/usr/bin/python2.6
+
+; 汽车之家，仅内网
+[qczj]
+10.169.0.62
+10.169.0.63
+10.169.0.64
+10.169.0.65
+10.169.0.66
+10.169.0.67
+10.169.0.68
+10.169.0.69
+10.169.0.70
+10.169.0.71
+10.169.0.72
+10.169.0.73
+10.169.0.74
+10.169.0.75
+10.169.0.76
+
+; 人保金服
+[rbjf]
+39.105.88.64 ansible_user=root ansible_ssh_pass=Rbjfkefu890 ansible_python_interpreter=/usr/bin/python2.6
+39.105.88.22 ansible_user=root ansible_ssh_pass=Rbjfkefu890 ansible_python_interpreter=/usr/bin/python2.6
+39.107.113.22 ansible_user=root ansible_ssh_pass=Rbjfkefu890 ansible_python_interpreter=/usr/bin/python2.6
+39.105.37.25 ansible_user=root ansible_ssh_pass=Rbjfkefu890 ansible_python_interpreter=/usr/bin/python2.6
+39.106.29.229 ansible_user=root ansible_ssh_pass=Rbjfkefu890 ansible_python_interpreter=/usr/bin/python2.6
+39.105.99.212 ansible_user=root ansible_ssh_pass=Rbjfkefu890 ansible_python_interpreter=/usr/bin/python2.6
+39.105.99.147 ansible_user=root ansible_ssh_pass=Rbjfkefu890 ansible_python_interpreter=/usr/bin/python2.6
+39.105.96.160 ansible_user=root ansible_ssh_pass=Rbjfkefu890 ansible_python_interpreter=/usr/bin/python2.6
+39.105.92.60 ansible_user=root ansible_ssh_pass=Rbjfkefu890
+39.105.59.95 ansible_user=root ansible_ssh_pass=Rbjfkefu890
+39.105.50.124 ansible_user=root ansible_ssh_pass=Rbjfkefu890 ansible_python_interpreter=/usr/bin/python2.6
+39.105.69.111 ansible_user=root ansible_ssh_pass=Rbjfkefu890 ansible_python_interpreter=/usr/bin/python2.6
+39.105.68.199 ansible_user=root ansible_ssh_pass=Rbjfkefu890 ansible_python_interpreter=/usr/bin/python2.6
+
+; 外联出国
+; [wlcg]
+
+; 上海银联，VPN
+; [shyl]
+
+; 广东电信
+; [gddx]
+
+; 能够公网访问的机器
+[public:children]
+ah
+qw
+qd
+scdx
+rbjf
