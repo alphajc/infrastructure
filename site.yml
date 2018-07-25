@@ -1,8 +1,22 @@
 ---
-- name: 配置所有能公网访问的机器
-  hosts: public
+# - name: 配置所有能公网访问的机器
+#   hosts: yxxa-jump
+#   remote_user: root
+#   gather_facts: no
+#
+#   roles:
+#   - centos6
+
+# - name: 配置易鑫西安跳板机
+#   hosts: yxxa-jump
+#   remote_user: root
+#
+#   roles:
+#   - centos
+
+- name: 配置外联出国跳板机
+  hosts: wlcg-jump
   remote_user: root
-  gather_facts: no
 
   roles:
-  - centos6
+  - centos

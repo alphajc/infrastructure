@@ -5,16 +5,23 @@
     state: present
     key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
 
-- name: 安装nss-pam-ldapd
+- name: 安装nss-pam-ldapd和其它依赖项
   yum:
-    name: nss-pam-ldapd
+    name: "{{ packages }}"
     state: present
+  vars:
+    packages:
+    - libselinux-python
+    - nss-pam-ldapd
 
 - name: 修改authconfig的python版本
   lineinfile:
     path: /usr/share/authconfig/authconfig.py
     regexp: '^#!/usr/bin/python'
     line: '#!/usr/bin/python2.6'
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "6"
 
 - name: 配置LDAP客户端
   shell: |

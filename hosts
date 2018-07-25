@@ -52,6 +52,10 @@
 10.8.1.123
 10.8.1.5
 
+; 易鑫西安跳板机
+[yxxa-jump]
+222.90.136.74 ansible_user=root ansible_port=51000 ansible_ssh_pass=taoche.2018
+
 ; 趣店，有访问控制
 [qd]
 47.98.242.36 ansible_user=add_tmp ansible_ssh_pass=2NF53dMFM8CF1n3w ansible_become=yes ansible_become_user=root
@@ -109,6 +113,9 @@ db3 ansible_host=120.55.48.189 ansible_port=50024 ansible_user=add_tmp  ansible_
 
 ; 外联出国
 ; [wlcg]
+; 外联出国跳板机 CentOS7
+[wlcg-jump]
+180.169.239.34 ansible_user=root ansible_port=8022
 
 ; 上海银联，VPN
 ; [shyl]
