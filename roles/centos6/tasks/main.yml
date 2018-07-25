@@ -1,19 +1,22 @@
 ---
-- name: Install nss-pam-ldapd
+- name: 配置SSH公钥-jerry
+  authorized_key:
+    user: root
+    state: present
+    key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+
+- name: 安装nss-pam-ldapd
   yum:
     name: nss-pam-ldapd
     state: present
 
-- name: Modify authconfig python version
-  shell: |
-    AUTHCONFIG=$(which authconfig)
+- name: 修改authconfig的python版本
+  lineinfile:
+    path: /usr/share/authconfig/authconfig.py
+    regexp: '^#!/usr/bin/python'
+    line: '#!/usr/bin/python2.6'
 
-    sed -i -e '1i#!/usr/bin/python2.6' /usr/share/authconfig/authconfig.py
-    ln -sf /usr/share/authconfig/authconfig.py $AUTHCONFIG
-  args:
-    executable: /bin/bash
-
-- name: Setting LDAP client
+- name: 配置LDAP客户端
   shell: |
     authconfig --enableshadow --enablemd5 \
     --enableldap \
@@ -30,7 +33,22 @@
   args:
     executable: /bin/bash
 
-- name: Ensure the nslcd service is running
+- name: 配置sudo-ldap.conf
+  blockinfile:
+    path: /etc/sudo-ldap.conf
+    backup: yes
+    block: |
+      uri {{ ldap_server }}
+      sudoers_base {{ sudoers_base }}
+    marker: "# sudo-ldap 配置信息 {mark}"
+
+- name: 配置命名服务交换文件
+  lineinfile:
+    path: /etc/nsswitch.conf
+    regexp: '^sudoers'
+    line: 'sudoers: files ldap'
+
+- name: 确保nslcd服务在运行中
   service:
     name: nslcd
     state: started
