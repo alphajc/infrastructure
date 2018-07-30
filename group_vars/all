@@ -1,5 +1,0 @@
----
-ldap_server: ldap://140.143.29.141
-basedn: dc=7moor,dc=com
-tls: false
-sudoers_base: ou=SUDOers,dc=7moor,dc=com
