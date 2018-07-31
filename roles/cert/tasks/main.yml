@@ -1,0 +1,9 @@
+- name: 上传证书
+  copy:
+    src: {{ item }}
+    dest: /opt/sslcrt/
+  with_fileglob:
+    - "{{ proj }}/*"
+
+# - name: 重载nginx
+#   shell: "/opt/nginx/sbin/nginx -s reload"
