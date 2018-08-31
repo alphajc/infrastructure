@@ -25,7 +25,9 @@
 
 - name: 配置LDAP客户端
   shell: |
-    authconfig --enableshadow --enablemd5 \
+    authconfig --enableshadow \
+    --disablesssd \
+    --disablesssdauth \
     --enableldap \
     --enableldapauth \
     --ldapserver={{ ldap_server }} \
@@ -36,7 +38,7 @@
     --enablecache \
     --enablelocauthorize \
     --enablemkhomedir \
-    --update
+    --updateall
   args:
     executable: /bin/bash
 
@@ -55,7 +57,18 @@
     regexp: '^sudoers'
     line: 'sudoers: files ldap'
 
-- name: 确保nslcd服务在运行中
+- name: 确保nslcd服务在运行中-centos6
   service:
     name: nslcd
     state: started
+  when:
+     - ansible_distribution == "CentOS"
+     - ansible_distribution_major_version == "6"
+
+- name: 确保nslcd服务在运行-centos7
+  systemd:
+    name: nslcd
+    state: started
+  when:
+     - ansible_distribution == "CentOS"
+     - ansible_distribution_major_version == "7"

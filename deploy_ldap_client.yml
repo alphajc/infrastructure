@@ -1,21 +1,6 @@
 ---
-# - name: 配置所有能公网访问的机器
-#   hosts: yxxa-jump
-#   remote_user: root
-#   gather_facts: no
-#
-#   roles:
-#   - ldapc
-
-# - name: 配置易鑫西安跳板机
-#   hosts: yxxa-jump
-#   remote_user: root
-#
-#   roles:
-#   - ldapc
-
-- name: 配置外联出国跳板机
-  hosts: wlcg-jump
+- name: 部署ldap客户端
+  hosts: all
   remote_user: root
 
   roles:
