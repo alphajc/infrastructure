@@ -1,0 +1,12 @@
+- name: 准备工作
+  include_tasks: pre.yml
+- name: 磁盘分区
+  include_tasks: partition.yml
+- name: 系统调优
+  include_tasks: install.yml
+- name: 安装nagios
+  include_tasks: nagios.yml
+- name: 配置NRPE
+  include_tasks: nrpe.yml
+- name: 清理安装文件
+  include_tasks: clean.yml

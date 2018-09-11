@@ -1,0 +1,39 @@
+- name: tar zxf dahdi-linux dahdi-tools
+  unarchive:
+    src: '{{ item }}'
+    dest: /tmp/pbx
+    group: root
+    owner: root
+  with_items:
+    - dahdi-linux-2.2.1.tar.gz
+    - dahdi-tools-2.2.1.tar.gz
+- name: make
+  make:
+    chdir: /tmp/pbx/dahdi-linux-2.2.1
+- name: make instll
+  make:
+    chdir: /tmp/pbx/dahdi-linux-2.2.1
+    target: install
+- name: ./configure
+  shell: ./configure
+  args:
+    chdir: /tmp/pbx/dahdi-tools-2.2.1
+- name: make
+  make:
+    chdir: /tmp/pbx/dahdi-tools-2.2.1
+- name: make install
+  make:
+    chdir: /tmp/pbx/dahdi-tools-2.2.1
+    target: '{{ item }}'
+  with_items:
+    - install
+    - config
+- name: mv dahdi dahdi.conf
+  shell:  mv /etc/modprobe.d/dahdi /etc/modprobe.d/dahdi.conf
+  ignore_errors: True
+- name: mv dahdi.blacklist dahdi.conf
+  shell: mv /etc/modprobe.d/dahdi.blacklist /etc/modprobe.d/dahdi.blacklist.conf
+  ignore_errors: True
+- name: restart dahdi
+  shell: /etc/init.d/dahdi restart
+  ignore_errors: True

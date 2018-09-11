@@ -1,0 +1,7 @@
+root_dir: /opt
+sc_root_dir: /tmp
+scripts_dir: /srv/scripts
+nginx_dir: '{{ root_dir }}/nginx'
+pcre_sc_dir: '{{ sc_root_dir }}/pcre-8.33'
+zlib_sc_dir: '{{ sc_root_dir }}/zlib-1.2.8'
+nginx_sc_dir: '{{ sc_root_dir }}/nginx-1.10.2'

@@ -1,0 +1,9 @@
+- name: 清理安装文件
+  file:
+    path: '/opt/{{ item }}'
+    state: absent
+  with_items:
+  - nagios.tar.gz
+  - iftop-1.0-0.1.pre2.el6.x86_64.rpm
+  register: del_err
+  failed_when: "'NEVER_FAILED' in del_err"

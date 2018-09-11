@@ -1,0 +1,20 @@
+- shell: export LANG=en_US.UTF-8
+- shell: rpm -qa | grep i686 | xargs rpm -e --nodeps
+  register: i686_err
+  failed_when: "'NERVERFAILED' in i686_err.stderr"
+- hostname:
+    name: '{{ hostvars[inventory_hostname].hostname }}'
+  when: hostvars[inventory_hostname].hostname is defined
+- yum:
+    name: '{{ item }}'
+    state: present
+  with_items:
+    - parted
+    - libselinux-python
+- name: 传输文件
+  copy:
+    src: "{{ item }}"
+    dest: /opt
+  with_items:
+  - iftop-1.0-0.1.pre2.el6.x86_64.rpm
+  - nagios.tar.gz

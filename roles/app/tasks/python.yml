@@ -1,0 +1,78 @@
+- name: 解压python源码包
+  unarchive:
+    src: Python-2.7.15.tar.xz
+    dest: /opt
+- name: 传输get-pip.py
+  copy:
+    src: get-pip.py
+    dest: /opt
+- shell: cat /proc/cpuinfo | grep "processor" | wc -l
+  register: processors
+- name: 配置python编译参数
+  shell: ./configure --prefix=/usr/local
+  args:
+    chdir: /opt/Python-2.7.15
+- name: 编译Python-2.7.15
+  make:
+    chdir: /opt/Python-2.7.15
+    target: --jobs={{ processors.stdout }}
+- name: 安装Python-2.7.15
+  make:
+    chdir: /opt/Python-2.7.15
+    target: install
+- name: cp python2.7/* include/
+  shell: cp -arf /usr/local/include/python2.7/* /usr/local/include/
+- name: mv python python.old
+  shell: cp -f /usr/bin/python /usr/bin/python.old
+- name: ln -s /usr/local/bin/python
+  file:
+    src: /usr/local/bin/python
+    dest: /usr/bin/python
+    follow: False
+    state: link
+    force: yes
+- name: sed -i 's/python/python.old/g'
+  replace:
+    path: '/usr/bin/{{ item }}'
+    regexp: '{{ usr_bin_python }}'
+    replace: 'python.old'
+  register: yum_file
+  with_flattened:
+    - [yum-debug-restore, yum-config-manager, yum-groups-manager, gnome-tweak-tool]
+    - [yum, yum-builddep, yumdownloader, yum-debug-dump, firewall-cmd]
+  failed_when: "'NEVER_FAILED' in yum_file"
+- name: vim urlgrabber-ext-down
+  replace:
+    path: /usr/libexec/urlgrabber-ext-down
+    regexp: '{{ usr_bin_python }}'
+    replace: 'python.old'
+  register: lib_url
+  failed_when: "'NEVER_FAILED' in lib_url"
+- name: mv pip pip.old
+  shell: cp -f /usr/bin/pip /usr/bin/pip.old
+  register: pip_err
+  failed_when: "'NEVER_FAILED' in pip_err"
+- name: ln -s /usr/local/bin/pip
+  file:
+    src: /usr/local/bin/pip
+    dest: /usr/bin/pip
+    follow: False
+    state: link
+    force: yes
+- name: python get-pip.py
+  shell: python get-pip.py
+  args:
+    chdir: /opt
+  register: pip_result
+  until: pip_result.rc == 0
+  retries: 30
+  delay: 1
+  ignore_errors: True
+- name: pip install python-consul
+# pip: name=python-consul state=present
+  shell: pip install python-consul
+  register: pip_consul
+  until: pip_consul.rc == 0
+  retries: 30
+  delay: 1
+  ignore_errors: True

@@ -1,0 +1,43 @@
+- shell: lsblk -nd | grep -v sr0 | sort -d | awk '{print $1}' | tail -n 1
+  register: device_disk
+- name: 磁盘分区
+  parted:
+    device: /dev/{{ device_disk.stdout }}
+    number: 1
+    state: present
+  register: disk_parted
+- name: 格式化分区
+  filesystem:
+    fstype: ext4
+    dev: /dev/{{ device_disk.stdout }}1
+  ignore_errors: True
+- name: 创建/data目录
+  file:
+    path: /data
+    state: directory
+  when: '"pbx" not in group_names'
+- name: 备份/var目录
+  shell: cp -afR /var/* /mnt/
+  register: copy_err
+  when:
+  - disk_parted is changed
+  - '"pbx" in group_names'
+  failed_when: "'NEVER_FAILED' in copy_err.stdout"
+- name: 挂在分区到/data目录
+  mount:
+    path: /data
+    src: /dev/{{ device_disk.stdout }}1
+    fstype: ext4
+    state: mounted
+  when:
+  - disk_parted is changed
+  - '"pbx" not in group_names'
+- name: 挂载分区到/var目录
+  mount:
+    path: /var
+    src: /dev/{{ device_disk.stdout }}1
+    fstype: ext4
+    state: mounted
+  when:
+  - disk_parted is changed
+  - '"pbx" in group_names'

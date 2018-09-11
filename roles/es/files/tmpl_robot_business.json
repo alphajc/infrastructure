@@ -1,0 +1,45 @@
+    {
+        "template": "robot_business_v1",
+        "settings" : {
+            "number_of_shards" : 5,
+            "number_of_replicas" : 0,
+            "analysis" :{
+                    filter :{
+                       stopFilter :{
+                            type : "stop",
+                            stopwords_path : "stopwords.txt"
+                       }
+                    },
+                    analyzer :{
+                        query_ansj :{
+                            type : "custom",
+                            char_filter : ["html_strip"],
+                            tokenizer : "query_ansj",
+                            filter : ["lowercase", "stopFilter"]
+                            
+                        }
+
+                    }
+            }
+                           
+        },
+        "aliases" : {
+            "robot-business" : {}
+        },
+        "mappings": {
+            "_default_": {
+                "_all": { "enabled": false },
+                "_source" : {"enabled" : true }, 
+                "properties" : {
+                    "name" : {"type" : "string",  "index" : "not_analyzed", "copy_to": "question"},
+                    "likeness" : { "type" : "string",  "index" : "not_analyzed", "copy_to": "question"},
+                    "question" : { "type" : "string", "analyzer" : "index_ansj", "search_analyzer" : "query_ansj", "norms": { "enabled": false }, "index_options": "docs" },
+                    "answer" : { "type" : "string",  "index" : "no"},
+                    "createTime" : { "type" : "string", "index" : "not_analyzed" },
+                    "status" : { "type" : "string", "index" : "not_analyzed" },
+                    "type":{"type" : "string", "index" : "not_analyzed"},
+                    "referQuestions" : { "type" : "string",  "index" : "no"}
+                 }
+            }
+        }
+    }

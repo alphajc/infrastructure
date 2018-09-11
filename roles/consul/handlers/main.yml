@@ -1,0 +1,11 @@
+- name: 启动consul-template
+  shell: |
+    [[ $(ps -ef | grep consul-template | grep -v grep | wc -l) -eq 1 ]] \
+    && pkill -F {{ template_pid_file }} -2; \
+    nohup /bin/consul-template -config {{ template_config }} >> {{ template_log }} 2>&1 &
+  args:
+    executable: /bin/bash
+  ignore_errors: yes
+
+- name: 重载nginx
+  shell: /opt/nginx/sbin/nginx -s reload

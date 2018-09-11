@@ -1,0 +1,61 @@
+---
+- name: 初始化服务器
+  hosts: all
+  remote_user: root
+  roles:
+  - ldapc
+  - common
+  tags:
+  - init
+
+- name: 初始化应用服务器
+  hosts: app
+  remote_user: root
+  roles:
+  - nginx
+  - app
+  tags:
+  - app
+
+- name: 初始化语音服务器
+  hosts: pbx
+  remote_user: root
+  roles:
+  - nginx
+  - pbx
+  tags:
+  - pbx
+
+- name: 初始化consul环境
+  hosts: consul
+  remote_user: root
+  vars_files:
+  - "roles/consul/vars/{% if 'consuls' in group_names %}consuls{% else %}consulc{% endif %}.yml"
+  roles:
+  - consul
+  tags:
+  - consul
+
+- name: 部署elasticsearch服务
+  hosts: es
+  remote_user: root
+  roles:
+  - es
+  tags:
+  - es
+
+- name: 部署redis服务
+  hosts: redis
+  remote_user: root
+  roles:
+  - redis
+  tags:
+  - redis
+
+- name: 部署openoffice
+  hosts: office
+  remote_user: root
+  roles:
+  - office
+  tags:
+  - office

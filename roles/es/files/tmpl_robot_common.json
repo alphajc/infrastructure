@@ -1,0 +1,18 @@
+    {
+        "template": "robot-common",
+        "settings" : {
+            "number_of_shards" : 5,
+            "number_of_replicas" : 0
+        },
+        "mappings": {
+            "_default_": {
+                "_all": { "enabled": false },
+                "_source" : {"enabled" : true }, 
+                "properties" : {
+                    "name" : {"type" : "string", "analyzer" : "index_ansj", "search_analyzer" : "query_ansj"},
+                    "answer" : { "type" : "string", "index" : "no"},
+                    "type":{"type" : "string", "index" : "not_analyzed"}
+                 }
+            }
+        }
+    }

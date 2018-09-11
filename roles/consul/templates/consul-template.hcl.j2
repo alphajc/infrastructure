@@ -1,0 +1,29 @@
+consul {
+  address = "localhost:8500"
+  retry {
+    enabled = true
+    attempts = 5
+    backoff = "250ms"
+  }
+}
+
+max_stale = "10m"
+log_level = "{{ template_log_level }}"
+pid_file = "{{ template_pid_file }}"
+
+template {
+  source = "{{ template_src }}"
+  destination = "{{ template_dest }}"
+
+  command = "{{ template_trigger }}"
+  command_timeout = "60s"
+  perms = 0600
+  backup = true
+  left_delimiter  = "<<"
+  right_delimiter = ">>"
+
+  wait {
+    min = "2s"
+    max = "10s"
+  }
+}

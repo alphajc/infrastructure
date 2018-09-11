@@ -1,0 +1,10 @@
+install_path: /opt
+host: "{{ (ansible_all_ipv4_addresses | ipaddr('192.168.0.0/16') or ansible_all_ipv4_addresses | ipaddr('10.0.0.0/8') or ansible_all_ipv4_addresses | ipaddr('172.16.0.0/12')) | join(',') }}"
+bind_addr: "127.0.0.1{{ ','~host }}"
+publish_addr: "{{ host }}"
+http_port: 9200
+tcp_port: 9900
+# redis_addr: localhost:6379
+redis_passwd: 7moorcom
+
+java_home: /opt/jdk1.8.0_181

@@ -1,0 +1,14 @@
+- name: 安装speex
+  include_tasks: libspeex.yml
+- name: pbx安装
+  include_tasks: pbx.yml
+  when: "'pbx' in group_names"
+- name: 半托管安装
+  include_tasks: btg.yml
+  when: "'btg' in group_names"
+- name: 安装asterisk
+  include_tasks: asterisk.yml
+- name: 配置nginx
+  include_tasks: nginx.yml
+- name: 配置asterisk
+  include_tasks: config.yml

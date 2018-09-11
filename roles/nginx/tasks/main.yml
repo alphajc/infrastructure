@@ -1,0 +1,103 @@
+- name: 停止NGINX服务
+  shell: ps -ef | grep  nginx | grep "worker process" | grep -v nobody | awk '{print $3}' | uniq -d | xargs kill -9
+  register: kill_err
+  failed_when: "'NEVERFAILED' in kill_err"
+- name: 安装 pcre-devel
+  yum:
+    name: pcre-devel
+    state: present
+  register: pcre_err
+  failed_when: "'NEVERFAILED' in pcre_err"
+- stat:
+    path: '{{ sc_root_dir }}'
+  register: sc
+- name: 解压nginx包
+  unarchive:
+    src: '{{ item }}'
+    dest: '{{ sc_root_dir }}'
+  with_items:
+  - nginx-1.10.2.tar.xz
+  - pcre-8.33.tar.xz
+  - zlib-1.2.8.tar.xz
+  when: sc.stat.exists == false
+- name: 添加nginx组
+  group:
+    name: nginx
+    state: present
+- name: 添加nginx用户
+  user:
+    name: nginx
+    state: present
+    group: nginx
+    system: yes
+    shell: /sbin/nologin
+- name: 配置编译参数
+  shell: "./configure --user=nginx --group=nginx --prefix={{ nginx_dir }} --with-http_stub_status_module --with-http_ssl_module --with-http_realip_module --with-http_addition_module --with-pcre={{ pcre_sc_dir }}  --with-zlib={{ zlib_sc_dir }}"
+  args:
+    chdir: '{{ sc_root_dir }}'
+  tags:
+    - nginx_configure
+- name: 编译
+  make:
+    chdir: '{{ sc_root_dir }}'
+  tags:
+    - nginx_make
+- name: 安装
+  make:
+    chdir: '{{ sc_root_dir }}'
+    target: install
+  tags:
+    - nginx_makeinstall
+- name: 创建配置文件目录
+  file:
+    path: '{{ nginx_dir }}/conf.d'
+    state: directory
+    owner: root
+    group: root
+
+- name: 创建ssl证书目录
+  file:
+    path: /open/nginx/ssl
+    state: directory
+
+- name: 拷贝pbx默认证书
+  copy:
+    src: "{{ item }}"
+    dest: /opt/nginx/ssl
+  with_items:
+  - _.7moor.com.crt
+  - _.7moor.com.key
+
+- name: 渲染配置文件
+  template:
+    src: nginx.conf.j2
+    dest: "{{ nginx_dir }}/nginx.conf"
+- name: 启动nginx
+  shell: "{{ nginx_dir }}/sbin/nginx -c {{ nginx_dir }}/nginx.conf"
+  register: nginx_started
+  failed_when: "'NEVER_FAILED' in nginx_started"
+  tags:
+    - nginx_start
+- name: 将nginx写入自启
+  lineinfile:
+    path: /etc/rc.d/rc.local
+    line: '{{ nginx_dir }}/sbin/nginx -c {{ nginx_dir }}/nginx.conf'
+- name: 创建存放日志切割脚本的目录
+  file:
+    path: '{{ scripts_dir }}'
+    state: directory
+- name: 拷贝日志切割脚本
+  copy:
+    src: nginx_cutlog.sh
+    dest: '{{ scripts_dir }}'
+    mode: 0755
+- name: 添加定时任务
+  cron:
+    name: "nginx cutlog"
+    minute: "0"
+    hour: "0"
+    job: "/bin/sh {{ scripts_dir }}/nginx_cutlog.sh"
+- name: 重启crond服务
+  service:
+    name: crond
+    state: restarted

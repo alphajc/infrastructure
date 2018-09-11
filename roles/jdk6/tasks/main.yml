@@ -1,0 +1,32 @@
+- name: 卸载openjdk
+  shell: rpm -qa | grep "^java" | xargs rpm -e --nodeps
+  ignore_errors: True
+- name: 检测/opt/java目录是否存在
+  command: test -d /opt/java
+  register: java_dir
+  failed_when: "'FAILED' in java_dir.stderr"
+- name: 传输JDK6安装文件
+  copy:
+    src: jdk-6u24-linux-x64.bin
+    dest: /opt
+- name: 安装JDK6
+  shell: "bash /opt/jdk-6u24-linux-x64.bin"
+  args:
+    chdir: /opt
+  when: java_dir.rc == 1
+- name: 重命名JDK安装路径
+  command: mv jdk1.6.0_24 java
+  args:
+    chdir: /opt/
+  when: java_dir.rc == 1
+- name: 将JDK6写入环境变量
+  blockinfile:
+    path: /etc/profile
+    state: present
+    insertafter: EOF
+    block: |
+      JAVA_HOME=/opt/java
+      JRE_HOME=$JAVA_HOME/jre
+      CLASSPATH=:$JAVA_HOME/lib:$JRE_HOME/lib
+      PATH=$JAVA_HOME/bin:$PATH
+      export JAVA_HOME JRE_HOME CLASSPATH PATH

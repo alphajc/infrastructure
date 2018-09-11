@@ -1,0 +1,4 @@
+- name: 解压JDK8
+  unarchive:
+    src: jdk-8u181-linux-x64.tar.gz
+    dest: /opt

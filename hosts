@@ -127,18 +127,50 @@ k8s02 ansible_host=188.131.178.164 ansible_user=chenjj ansible_ssh_pass=Wy7Ua6bR
 ; 广东电信
 ; [gddx]
 
-[pc]
-pc1 ansible_port=65022 ansible_host=123.206.95.30 ansible_user=chenjj ansible_ssh_pass=OWEyNTIyZDViNmJi ansible_become=yes ansible_become_user=root
-pc2 ansible_port=65022 ansible_host=140.143.29.141 ansible_user=chenjj ansible_ssh_pass=OWEyNTIyZDViNmJi ansible_become=yes ansible_become_user=root
-pbx ansible_port=65022 ansible_host=121.196.235.57 ansible_user=quqw ansible_ssh_pass=7moorcom ansible_become=yes ansible_become_user=root
+; 赛普项目服务器
+[sp]
+app.7moor.sp ansible_host=123.59.28.139 ansible_user=root ansible_ssh_pass=saipu@2016 ansible_python_interpreter=/usr/bin/python2.6
+db1.7moor.sp ansible_host=123.59.28.140 ansible_user=root ansible_ssh_pass=saipu@2016 ansible_python_interpreter=/usr/bin/python2.6
+db2.7moor.sp ansible_host=123.59.28.141 ansible_user=root ansible_ssh_pass=saipu@2016 ansible_python_interpreter=/usr/bin/python2.6
+pbx.7moor.sp ansible_host=123.59.28.142 ansible_user=root ansible_ssh_pass=saipu@2016 ansible_python_interpreter=/usr/bin/python2.6
 
-; 能够公网访问的机器
-[public:children]
-ah
-qw
-qd
-scdx
-rbjf
-pc
-wlcg-jump
-yxxa-jump
+[consuls]
+app.7moor.sp
+db1.7moor.sp
+db2.7moor.sp
+
+[consulc]
+
+[consul:children]
+consuls
+consulc
+
+[app]
+app.7moor.sp
+db1.7moor.sp
+
+[pbx]
+pbx.7moor.sp instance=zj.sp.1 ip=123.59.28.142 n_ip=123.59.28.142 mask=255.255.255.224
+
+[pbx:vars]
+start=0
+end=9
+
+[es]
+db1.7moor.sp redis_addr=192.168.10.11:6379
+
+[office]
+app.7moor.sp
+
+[redis]
+db1.7moor.sp
+
+[master]
+
+[slave]
+
+; 私有云部门服务器
+[pc]
+zjtest01.7moor.com ansible_port=65022 ansible_host=123.206.95.30 ansible_user=chenjj ansible_ssh_pass=OWEyNTIyZDViNmJi ansible_become=yes ansible_become_user=root
+zjtest02.7moor.com ansible_port=65022 ansible_host=140.143.29.141 ansible_user=chenjj ansible_ssh_pass=OWEyNTIyZDViNmJi ansible_become=yes ansible_become_user=root
+pbx.pc.7moor.com ansible_port=65022 ansible_host=121.196.235.57 ansible_user=quqw ansible_ssh_pass=7moorcom ansible_become=yes ansible_become_user=root

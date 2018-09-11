@@ -1,0 +1,6 @@
+- name: 再次构建nagios插件
+  make:
+    chdir: /opt/nagios/nagios-plugins-1.4.16
+  register: nagios_err
+  failed_when: "'NEVER_FAILED' in nagios_err.stdout"
+  when: "'error' in nagios_err.stderr"

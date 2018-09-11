@@ -1,0 +1,5 @@
+##nginx
+nginx_dir: '/opt/nginx'
+##ansterisk
+asterisk_range: "{% for i in range(start, end+1) %}{{ i }} {% endfor %}"
+asterisk_list: "{{ asterisk_range.split(' ')[0:-1] | join(', ') }}"

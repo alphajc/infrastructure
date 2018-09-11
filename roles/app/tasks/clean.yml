@@ -1,0 +1,9 @@
+- name: 清理安装文件
+  file:
+    path: '/opt/{{ item }}'
+    state: absent
+  with_items:
+    - get-pip.py
+    - Python-2.7.15
+  register: del_err
+  failed_when: "'NEVER_FAILED' in del_err"

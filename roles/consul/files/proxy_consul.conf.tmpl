@@ -1,0 +1,59 @@
+<<range $index, $service := services>>
+  <<if contains "service" $service.Tags>>
+    <<range $tag, $services := service $service.Name | byTag>>
+      <<if and ($tag | regexMatch "^v-.*") (not ($tag | regexMatch "^v-local-.*"))>>
+    upstream <<$service.Name>>-<<$tag>> {
+        <<range $services>>server <<.Address>>:<<.Port>>;
+        <<end>>
+    }
+      <<end>>
+    <<end>>
+  <<end>>
+<<end>>
+
+<<range $index,$entity := tree "_services">>
+  <<range $tag, $services := service (print $entity.Key "|any") | byTag>>
+    <<if $tag | regexMatch "^v-local.*">>
+  upstream <<$entity.Key>>-<<$tag>> {
+        <<range $services>>server <<.Address>>:<<.Port>>;
+        <<end>>
+  }
+    <<end>>
+  <<end>>
+<<end>>
+
+server {
+    listen       8800;
+    server_name  .* "" localhost;
+
+<<range $index, $service := services>>
+  <<if contains "service" $service.Tags>>
+    <<range $tag, $services := service $service.Name | byTag>>
+      <<if and ($tag | regexMatch "^v-.*") (not ($tag | regexMatch "^v-local-.*"))>>
+      location ~ ^/<<$service.Name>>-<<$tag>>(?!(-))(/?)(.*)$ {
+        proxy_pass http://<<$service.Name>>-<<$tag>>/$3$is_args$args;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        <<if (or (eq $service.Name "kefu-node-server") (eq $service.Name "gateway") (eq $service.Name "cc-server-in") )>>client_max_body_size 100M;<<end>>
+      }
+      <<end>>
+    <<end>>
+  <<end>>
+<<end>>
+
+<<range $index,$entity := tree "_services">>
+  <<range $tag, $services := service (print $entity.Key "|any") | byTag>>
+    <<if $tag | regexMatch "^v-local.*">>
+  location ~ ^/<<$entity.Key>>-<<$tag>>(?!(-))(/?)(.*)$ {
+        proxy_pass http://<<$entity.Key>>-<<$tag>>/$3$is_args$args;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+      }
+    <<end>>
+  <<end>>
+<<end>>
+}

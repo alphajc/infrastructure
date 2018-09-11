@@ -1,0 +1,10 @@
+- name: 安装redis并做初始配置
+  include_tasks: install.yml
+
+- name: 配置master
+  include_tasks: master.yml
+  when: "'master' in group_names"
+
+- name: 配置slave
+  include_tasks: slave.yml
+  when: "'slave' in group_names"

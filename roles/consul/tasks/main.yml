@@ -1,0 +1,94 @@
+- name: 安装unzip
+  yum:
+    name: unzip
+    state: present
+
+- name: 安装consul
+  unarchive:
+    src: "{{ item }}"
+    dest: /bin/
+  with_fileglob:
+    - "zips/*"
+
+- name: 移除consul脏数据
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /data/consul
+    - /opt/consul
+
+- name: 保证相关consul路径
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - /data/consul
+    - /opt/consul
+
+- name: 渲染consul配置文件
+  template:
+    src: "{{ conf }}"
+    dest: "{{ consul_config }}"
+
+- name: 渲染consul-template配置文件
+  template:
+    src: consul-template.hcl.j2
+    dest: "{{ template_config }}"
+  when: '"app" in group_names'
+
+- name: 上传nginx模板文件
+  copy:
+    src: proxy_consul.conf.tmpl
+    dest: /opt/consul/
+  when: '"app" in group_names'
+
+- name: 启动consul
+  shell: "pkill consul; nohup /bin/consul agent -config-file={{ consul_config }} >> {{ consul_log }} &"
+  args:
+    executable: /bin/bash
+  ignore_errors: yes
+
+- name: 添加自启动
+  blockinfile:
+    path: /etc/rc.local
+    marker: "# {mark} consul套件自启动"
+    block: |
+      nohup /bin/consul agent -config-file={{ consul_config }} >> {{ consul_log }} &
+      {% if 'app' in group_names %}
+      nohup /bin/consul-template -config {{ template_config }} >> {{ template_log }} &
+      {% endif %}
+
+- name: 安装curl
+  yum:
+    name: curl
+    state: present
+  when: '"app" in group_names'
+
+- name: 等待leader选举成功
+  get_url:
+    url: http://localhost:8500/v1/status/leader
+    dest: /tmp/
+  register: result
+  until: result.status_code == 200
+  retries: 5
+  delay: 2
+  notify: 启动consul-template
+  when: '"app" in group_names'
+
+- name: 代理consul界面
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  loop:
+    - src: consul.conf
+      dest: /opt/nginx/conf.d/
+    - src: passwd.db
+      dest: /opt/consul/
+  notify: 重载nginx
+  when: '"app" in group_names'
+
+- name: 安装python-consul
+  pip:
+    name: python-consul
+  when: '"app" in group_names'

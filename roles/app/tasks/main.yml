@@ -1,0 +1,6 @@
+- name: 安装Node环境
+  include_tasks: node.yml
+- name: 安装Python
+  include_tasks: python.yml
+- name: 清理安装文件
+  include_tasks: clean.yml

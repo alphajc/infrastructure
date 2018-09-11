@@ -1,10 +1,4 @@
 ---
-- name: 配置SSH公钥-jerry
-  authorized_key:
-    user: root
-    state: present
-    key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
-
 - name: 安装nss-pam-ldapd和其它依赖项
   yum:
     name: "{{ packages }}"
@@ -13,6 +7,12 @@
     packages:
     - libselinux-python
     - nss-pam-ldapd
+
+- name: 配置SSH公钥-jerry
+  authorized_key:
+    user: root
+    state: present
+    key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
 
 - name: 修改authconfig的python版本
   lineinfile:
@@ -60,6 +60,7 @@
 - name: 确保nslcd服务在运行中-centos6
   service:
     name: nslcd
+    enabled: yes
     state: started
   when:
      - ansible_distribution == "CentOS"
@@ -68,6 +69,7 @@
 - name: 确保nslcd服务在运行-centos7
   systemd:
     name: nslcd
+    enabled: yes
     state: started
   when:
      - ansible_distribution == "CentOS"

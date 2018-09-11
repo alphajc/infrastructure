@@ -1,0 +1,55 @@
+- name: 创建nrpe自启脚本
+  copy:
+    src: nrpe
+    dest: /etc/init.d/nrpe
+    force: yes
+    owner: root
+    group: root
+    mode: 0755
+- name: 设置nrpe开机自启
+  lineinfile:
+    path: /etc/rc.d/rc.local
+    state: present
+    regexp: '/etc/init.d/nrpe start'
+    line: '/etc/init.d/nrpe start'
+- name: 配置nrpe服务端白名单
+  replace:
+    path: /usr/local/nagios/etc/nrpe.cfg
+    regexp: "{{ item.attr }}"
+    replace: "{{ item.value }}"
+  with_items:
+    - { attr: '{{ nrpe_command_check }}', value: ''  }
+    - { attr: '{{ nrpe_allowed_hosts }}', value: '118.31.114.148' }
+- name: vim nrpe.cfg
+  blockinfile:
+    path: /usr/local/nagios/etc/nrpe.cfg
+    state: present
+    insertafter: EOF
+    block: |
+      command[check_load]=/usr/local/nagios/libexec/check_load -w 9,7,5 -c 50,30,15
+      command[check_mem]=/usr/local/nagios/libexec/check_memory.pl -w 10%
+      command[check_disk_/]=/usr/local/nagios/libexec/check_disk -W 50% -w 20% -c 10% -E /
+      command[check_disk_/var]=/usr/local/nagios/libexec/check_disk -W 50% -w 20% -c 10% -E /var
+      command[check_disk_/var/spool/asterisk]=/usr/local/nagios/libexec/check_disk -W 50% -w 20% -c 10% -E /var/spool/asterisk
+      command[check_disk_/data]=/usr/local/nagios/libexec/check_disk -W 50% -w 20% -c 10% -E /data
+      command[check_disk_/data2]=/usr/local/nagios/libexec/check_disk -W 50% -w 20% -c 10% -E /data2
+      command[check_disk_/dev/shm]=/usr/local/nagios/libexec/check_disk -W 50% -w 75% -c 50% -E /dev/shm
+      command[check_swap]=/usr/local/nagios/libexec/check_swap  -w 60% -c 60%
+      command[check_iostat]=/usr/local/nagios/libexec/check_iostat -w 6 -c 10
+      command[check_users]=/usr/local/nagios/libexec/check_users -w 1 -c 10
+      command[check_procs]=/usr/local/nagios/libexec/check_procs -w 300
+      command[check_file_des]=/usr/local/nagios/libexec/check_file_des -c 20000
+      command[check_net_num]=/usr/local/nagios/libexec/check_netstat -c 30000
+      command[check_traffic-p3p1]=/usr/local/nagios/libexec/check_traffic.sh -V 2c -C public -H 127.0.0.1 -I `ip add |grep ": p3p1:"|cut -d : -f 1` -w 10000,20000 -c 20000,30000 -M -b
+      command[check_traffic-p3p2]=/usr/local/nagios/libexec/check_traffic.sh -V 2c -C public -H 127.0.0.1 -I `ip add |grep ": p3p2:"|cut -d : -f 1` -w 10000,20000 -c 20000,30000 -M -b
+      command[check_traffic-p4p1]=/usr/local/nagios/libexec/check_traffic.sh -V 2c -C public -H 127.0.0.1 -I `ip add |grep ": p4p1:"|cut -d : -f 1` -w 10000,20000 -c 20000,30000 -M -b
+      command[check_traffic-p4p2]=/usr/local/nagios/libexec/check_traffic.sh -V 2c -C public -H 127.0.0.1 -I `ip add |grep ": p4p2:"|cut -d : -f 1` -w 10000,20000 -c 20000,30000 -M -b
+      command[check_traffic-em1]=/usr/local/nagios/libexec/check_traffic.sh -V 2c -C public -H 127.0.0.1 -I `ip add |grep ": em1:"|cut -d : -f 1` -w 10000,20000 -c 20000,30000 -M -b
+      command[check_traffic-bond0]=/usr/local/nagios/libexec/check_traffic.sh -V 2c -C public -H 127.0.0.1 -I `ip add |grep ": bond0:"|cut -d : -f 1` -w 10000,20000 -c 20000,30000 -M -b
+      command[check_traffic-bond1]=/usr/local/nagios/libexec/check_traffic.sh -V 2c -C public -H 127.0.0.1 -I `ip add |grep ": bond1:"|cut -d : -f 1` -w 10000,20000 -c 20000,30000 -M -b
+      command[check_traffic-eth0]=/usr/local/nagios/libexec/check_traffic.sh -V 2c -C public -H 127.0.0.1 -I `ip add |grep ": eth0:"|cut -d : -f 1` -w 10000,20000 -c 20000,30000 -M -b
+      command[check_traffic-eth1]=/usr/local/nagios/libexec/check_traffic.sh -V 2c -C public -H 127.0.0.1 -I `ip add |grep ": eth1:"|cut -d : -f 1` -w 10000,20000 -c 20000,30000 -M -b
+      command[check_sipproxy]=/usr/local/nagios/libexec/check_sipproxy_num -c 11
+      command[check_ASS]=/usr/local/nagios/libexec/check_http -H 127.0.0.1 -c 10
+      command[check_asteriskGuard]=/usr/local/nagios/libexec/check_log -F /var/log/asteriskGuard/monitor_0_0.log -O /var/log/asteriskGuard/monitor_0_0.log.old -q error
+      command[check_asterisk_rtp]=/usr/local/nagios/libexec/check_asterisk_rtp

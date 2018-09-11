@@ -1,0 +1,5 @@
+- name: 拷贝nginx的pbx配置文件
+  copy:
+    src: pbx.conf
+    dest: /opt/nginx/conf.d/
+  notify: 重载nginx服务

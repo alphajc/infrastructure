@@ -1,0 +1,13 @@
+host: "{{ (ansible_all_ipv4_addresses | ipaddr('192.168.0.0/16') or ansible_all_ipv4_addresses | ipaddr('10.0.0.0/8') or ansible_all_ipv4_addresses | ipaddr('172.16.0.0/12')) | join(' ') }}"
+build_path: /tmp
+data_path: /data/redis/data
+log_path: /data/redis/log
+sentinel_data_path: /data/redis-sentinel/data
+sentinel_log_path: /data/redis-sentinel/log
+config_path: /etc/redis
+log_level: debug
+sentinel_log_level: debug
+
+redis_port: 6379
+sentinel_port: 26379
+redis_pass: 7moorcom

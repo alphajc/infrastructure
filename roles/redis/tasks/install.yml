@@ -1,0 +1,52 @@
+- name: 创建源码包存放路径
+  file:
+    path: "{{ build_path }}"
+    state: directory
+
+- name: 解压源码包
+  unarchive:
+    src: redis-3.2.5.tar.gz
+    dest: "{{ build_path }}"
+  tags:
+  - unarchive
+
+- name: 编译redis
+  make:
+    chdir: "{{ build_path }}/redis-3.2.5"
+
+- name: 安装redis
+  make:
+    chdir: "{{ build_path }}/redis-3.2.5"
+    target: install
+
+- name: 创建redis相关目录
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+  - "{{ data_path }}"
+  - "{{ log_path }}"
+  - "{{ config_path }}"
+  - "{{ sentinel_data_path }}"
+  - "{{ sentinel_log_path }}"
+
+- name: 渲染配置文件
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+  - { src: "redis.conf.j2", dest: "{{ config_path }}/redis.conf" }
+  - { src: "sentinel.conf.j2", dest: "{{ config_path }}/sentinel.conf" }
+
+- name: 启动redis
+  shell: /usr/local/bin/redis-server {{ config_path }}/redis.conf
+
+- name: 启动sentinel
+  shell: /usr/local/bin/redis-server {{ config_path }}/sentinel.conf --sentinel
+
+- name: 写入开机自启
+  blockinfile:
+    path: /etc/rc.d/rc.local
+    block: |
+      /usr/local/bin/redis-server {{ config_path }}/redis.conf
+      /usr/local/bin/redis-server {{ config_path }}/sentinel.conf --sentinel

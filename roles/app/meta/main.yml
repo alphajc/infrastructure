@@ -1,0 +1,4 @@
+---
+dependencies:
+- role: jdk6
+- role: jdk8

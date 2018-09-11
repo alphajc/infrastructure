@@ -1,0 +1,53 @@
+- name: 配置asterisk编译参数
+  shell: ./configure
+  args:
+    chdir: /tmp/pbx/asterisk-1.4.44
+- name: 拷贝asterisk编译参数
+  copy:
+    src: menuselect.makeopts
+    dest: /tmp/pbx/asterisk-1.4.44
+- name: 编译asterisk
+  make:
+    chdir: /tmp/pbx/asterisk-1.4.44
+- name: 安装asterisk
+  make:
+    chdir: /tmp/pbx/asterisk-1.4.44
+    target: install
+- name: 配置sox编译参数
+  shell: ./configure
+  args:
+    chdir: /tmp/pbx/sox-14.0.0
+- name: 编译sox
+  make:
+    chdir: /tmp/pbx/sox-14.0.0
+- name: 安装sox
+  make:
+    chdir: /tmp/pbx/sox-14.0.0
+    target: install
+- name: 配置lame编译参数
+  shell: ./configure
+  args:
+    chdir: /tmp/pbx/lame-3.98.4
+- name: 编译lame
+  make:
+    chdir: /tmp/pbx/lame-3.98.4
+- name: 安装lame
+  make:
+    chdir: /tmp/pbx/lame-3.98.4
+    target: install
+- name: 拷贝codec_g729-ast14-gcc4-glibc-x86_64-pentium4.so到库
+  copy:
+    src: codec_g729-ast14-gcc4-glibc-x86_64-pentium4.so
+    dest: /usr/lib/asterisk/modules
+- name: 删除已有的moh
+  shell: rm -rf /var/lib/asterisk/moh/*
+- name: 删除已有的pbx音频
+  shell: rm -rf /var/lib/asterisk/sounds/*
+- name: 拷贝pbx音频
+  unarchive:
+    src: sounds.tar.gz
+    dest: /var/lib/asterisk/
+- name: 拷贝moh
+  unarchive:
+    src: moh.tar.gz
+    dest: /var/lib/asterisk/

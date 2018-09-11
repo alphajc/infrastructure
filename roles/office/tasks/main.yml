@@ -1,0 +1,38 @@
+- name: 创建临时文件夹
+  tempfile:
+    state: directory
+    prefix: pkg.
+  register: temp
+  tags:
+  - upload
+
+- name: 上传安装包
+  unarchive:
+    src: openoffice.tar.xz
+    dest: "{{ temp.path }}"
+  tags:
+  - upload
+
+- name: 安装office
+  shell: "rpm -i {{ temp.path }}/openoffice/RPMS/*.rpm"
+  tags:
+  - install
+
+- name: start openoffice
+  shell: '/opt/openoffice.org3/program/soffice -headless -accept="socket,host=127.0.0.1,port=8100;urp;" -nofirststartwizard &'
+  tags:
+  - post
+
+- name: echo openoffice >> /etc/rc.d/rc.local
+  lineinfile:
+    path: /etc/rc.d/rc.local
+    line: '/opt/openoffice.org3/program/soffice -headless -accept="socket,host=127.0.0.1,port=8100;urp;" -nofirststartwizard &'
+  tags:
+  - post
+
+- name: 删除临时文件夹
+  file:
+    path: "{{ temp.path }}"
+    state: absent
+  tags:
+  - post

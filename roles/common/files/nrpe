@@ -1,0 +1,19 @@
+#!/bin/bash
+#20120406
+case ${1} in
+start)
+       /usr/local/nagios/bin/nrpe -c /usr/local/nagios/etc/nrpe.cfg -d
+       echo  " Start nrpe     [ok] "
+;;
+stop)
+       kill -9 `cat /var/run/nrpe.pid`
+       echo  " Stop nrpe     [ok] "
+;;
+restart)
+       ${0} stop && ${0} start
+       echo  " Restart nrpe     [ok] "
+;;
+*)
+       echo  "Usage: ${0} {start|stop|restart}"
+;;
+esac

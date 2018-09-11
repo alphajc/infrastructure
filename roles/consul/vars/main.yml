@@ -1,0 +1,15 @@
+---
+template_pid_file: /opt/consul/consul-template.pid
+template_log_level: warn
+template_src: /opt/consul/proxy_consul.conf.tmpl
+template_dest: /opt/nginx/conf.d/proxy_consul.conf
+template_trigger: /opt/nginx/sbin/nginx -s reload
+template_config: /opt/consul/consul-template.hcl
+template_log: /opt/consul/consul-template.log
+
+consul_config: /opt/consul/config.json
+consul_log: /opt/consul/consul.log
+
+nginx_error_log: /var/log/nginx/error.log
+nginx_pid: /run/nginx.pid
+nginx_access_log: /var/log/nginx/access.log

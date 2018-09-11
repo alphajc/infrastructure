@@ -1,0 +1,8 @@
+nagios_dir: /opt/nagios
+snmp_mib2: '^#view mib2'
+nrpe_command_check: '^command\[check_.*'
+snmp_group_access: '(exact  ).*( none none)'
+usr_bin_python: '(?<=[#!\s?/usr/bin/])python.*'
+snmp_com2sec: '(?<=com2sec notConfigUser  )default'
+snmpd_options: '(OPTIONS=.).*(-p /var/run/snmpd\.pid)'
+nrpe_allowed_hosts: '(?<=allowed_hosts=)(?:[0-9]{1,3}\.){3}[0-9]{1,3}'

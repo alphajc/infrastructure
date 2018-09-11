@@ -1,0 +1,73 @@
+{
+  "template": "robot-unknownquestion",
+  "settings": {
+    "number_of_shards": 5,
+    "number_of_replicas": 0,
+    "analysis": {
+      "filter": {
+        "stopFilter": {
+          "type": "stop",
+          "stopwords_path": "stopwords.txt"
+        }
+      },
+      "analyzer": {
+        "query_ansj": {
+          "type": "custom",
+          "char_filter": [
+            "html_strip"
+          ],
+          "tokenizer": "query_ansj",
+          "filter": [
+            "lowercase",
+            "stopFilter"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "_default_": {
+      "_all": {
+        "enabled": false
+      },
+      "_source": {
+        "enabled": true
+      },
+      "properties": {
+        "name": {
+          "type": "string",
+          "analyzer": "index_ansj",
+          "search_analyzer": "query_ansj",
+          "norms": {
+            "enabled": false
+          }
+        },
+        "uid": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "cid": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "platform": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "account": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "createTime": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "ts": {
+          "type": "string",
+          "index": "not_analyzed"
+        }
+      }
+    }
+  }
+}
+

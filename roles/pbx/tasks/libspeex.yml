@@ -1,0 +1,30 @@
+- name: 创建日志目录：/var/log
+  file:
+    path: /var/log
+    state: directory
+- name: 解压nginx相关的
+  unarchive:
+    src: '{{ item }}'
+    dest: /tmp/pbx
+    owner: root
+    group: root
+  with_items: [speex-1.2rc1.tar.gz, asterisk-1.4.44.tar.gz, sox-14.0.0.tar.gz, lame-3.98.4.tar.gz]
+- name: 配置编译参数
+  shell: ./configure
+  args:
+    chdir: /tmp/pbx/speex-1.2rc1
+- name: 编译
+  make:
+    chdir: /tmp/pbx/speex-1.2rc1
+- name: 安装
+  make:
+    chdir: /tmp/pbx/speex-1.2rc1
+    target: install
+- name: 创建speex动态库软连接
+  file:
+    force: yes
+    src: '/usr/local/lib/{{ item }}'
+    dest: '/usr/lib/{{ item }}'
+    state: link
+  with_flattened:
+    - [libspeex.so, libspeex.so.1, libspeexdsp.so, libspeexdsp.so.1]

@@ -1,0 +1,91 @@
+- name: 添加nagios用户
+  user:
+    name: nagios
+    state: present
+    uid: 1081
+    system: no
+    shell: /sbin/nologin
+- name: 解压nagios.tar.gz
+  unarchive:
+    remote_src: yes
+    src: /opt/nagios.tar.gz
+    dest: /opt
+- name: 解压nagios_plugins.tar.gz
+  unarchive:
+    remote_src: yes
+    src: /opt/nagios/{{ item }}
+    dest: /opt/nagios
+  with_items:
+    - nrpe-2.12.tar.gz
+    - Config-Tiny-2.12.tar.gz
+    - Nagios-Plugin-0.34.tar.gz
+    - Class-Accessor-0.31.tar.gz
+    - Math-Calc-Units-1.07.tar.gz
+    - Params-Validate-0.91.tar.gz
+    - nagios-plugins-1.4.16.tar.gz
+    - Regexp-Common-2010010201.tar.gz
+- name: 配置nagios-plugins编译参数
+  shell: ./configure --with-nagios-user=nagios --with-nagios-group=nagios --enable-perl-modules
+  args:
+    chdir: /opt/nagios/nagios-plugins-1.4.16
+- name: 尝试构建nagios插件
+  make:
+    chdir: /opt/nagios/nagios-plugins-1.4.16
+  register: nagios_err
+  failed_when: "'NEVER_FAILED' in nagios_err.stdout"
+- lineinfile:
+    path: /opt/nagios/nagios-plugins-1.4.16/gl/stdio.in.h
+    regexp: 'gets is a security'
+    backrefs: yes
+    line: ''
+  when: "'error' in nagios_err.stderr"
+  notify: 再次构建nagios插件
+- shell: perl Makefile.PL --pm
+  args:
+    chdir: /opt/nagios/nagios-plugins-1.4.16/perlmods/Params-Validate-0.88
+  when: "'error' in nagios_err.stderr"
+  notify: 再次构建nagios插件
+- name: 安装nagios插件
+  make:
+    chdir: /opt/nagios/nagios-plugins-1.4.16
+    target: install
+- name: 配置nrpe编译参数
+  shell: ./configure
+  args:
+    chdir: /opt/nagios/nrpe-2.12
+- name: 编译nrpe
+  make:
+    chdir: /opt/nagios/nrpe-2.12
+- name: 安装nrpe
+  make:
+    chdir: /opt/nagios/nrpe-2.12
+    target: "{{ item }}"
+  with_flattened:
+    - [all, install-plugin, install-daemon, install-daemon-config]
+- name: 编译安装其它插件
+  shell: "cd {{ nagios_dir }}/{{ item[0] }} && {{ item[1] }}"       #punchline!!!
+  with_nested:
+    - [ 'Params-Validate-0.91', 'Class-Accessor-0.31', 'Config-Tiny-2.12', 'Math-Calc-Units-1.07', 'Regexp-Common-2010010201', 'Nagios-Plugin-0.34' ]
+    - [ 'perl Makefile.PL', 'make', 'make install' ]
+- name: 拷贝nagios可执行文件
+  shell: cp -f {{ item }} /usr/local/nagios/libexec
+  args:
+    chdir: /opt/nagios
+  with_flattened:
+    - [check_sipproxy_num, check_asterisk_rtp check_memory.pl, check_iostat check_file_des, check_netstat, check_traffic.sh]
+- name: 更改/usr/local/nagios/libexec权限
+  file:
+    path: /usr/local/nagios/libexec
+    state: directory
+    recurse: yes
+    mode: 755
+    owner: nagios
+    group: nagios
+- name: 更改/var/tmp/nagios权限
+  file:
+    path: /var/tmp/nagios
+    state: directory
+    force: yes
+    recurse: yes
+    owner: nagios
+    group: nagios

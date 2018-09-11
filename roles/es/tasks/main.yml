@@ -1,0 +1,64 @@
+- name: 解压elasticsearch2.4.1.tar.gz
+  unarchive:
+    src: elasticsearch2.4.1.tar.gz
+    dest: "{{ install_path }}"
+  tags:
+  - unarchive
+
+- name: 添加es用户组
+  group:
+    name: es
+    state: present
+
+- name: 添加es用户
+  user:
+    name: es
+    state: present
+    group: es
+    system: yes
+
+- name: 渲染es启动相关文件
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+  - { src: "elasticsearch.j2", dest: "{{ install_path }}/elasticsearch2.4.1/bin/elasticsearch" }
+  - { src: "elasticsearch.yml.j2", dest: "{{ install_path }}/elasticsearch2.4.1/config/elasticsearch.yml" }
+
+- name: 将es目录权限赋予es用户
+  file:
+    path: /opt/elasticsearch2.4.1
+    recurse: yes
+    owner: es
+    group: es
+
+- name: 启动es
+  shell: "su es -c '{{ install_path }}/elasticsearch2.4.1/bin/elasticsearch -d'"
+  args:
+    executable: /bin/bash
+  tags:
+  - es_start
+
+- name: 配置es自启动
+  lineinfile:
+    path: /etc/rc.d/rc.local
+    line: 'su es -c "{{ install_path }}/elasticsearch2.4.1/bin/elasticsearch -d"'
+
+# - name: 导入数据
+#   uri:
+#     url: "http://localhost:{{ http_port }}/{{ item.address }}"
+#     method: PUT
+#     return_content: yes
+#     body: "{{ lookup('file','{{ item.filename }}') }}"
+#     body_format: json
+#   with_items:
+#     - { address: 'app_kefu_im_message', filename: 'app_kefu_im_message.json' }
+#     - { address: 'robot-common', filename: 'tmpl_robot_common.json' }
+#     - { address: 'robot_business_v1', filename: 'tmpl_robot_business.json' }
+#     - { address: 'robot-unknownquestion', filename: 'tmpl_robot_unq_business.json' }
+#
+# - name: 测试
+#   debug:
+#     msg: "{{ hostvars }}"
+#   tags:
+#   - test

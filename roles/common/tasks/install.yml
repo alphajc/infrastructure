@@ -1,0 +1,81 @@
+- name: 安装必要工具
+  yum:
+    name: '{{ packages }}'
+    state: latest
+    skip_broken: yes
+  ignore_errors: True
+  vars:
+    packages: [kernel-devel,rpcbind,tree,ftp,sysstat,nc,perl-libxml-perl,dos2unix,ipmitool,minicom,lrzsz,iotop,telnet,ant,binutils,compat-libstdc++-33,elfutils-libelf,elfutils-libelf-devel,gcc,gcc-c++,glibc,glibc-common,glibc-devel,glibc-headers,libaio,libaio-devel,libgcc,libstdc++,libstdc++-devel,make,sysstat,unixODBC,unixODBC-devel,libXp,gcc,bison,openssl-devel,rpm-build,speex,ncurses-devel,net-snm*,openssl098e,crypto-utils,libcurl-devel,libcmpiCppImpl0,libwsman1,libss,openwsman-client,sblim-sfcc,sblim-sfcb,openwsman-server,ntp,lsb,libgnomeui-devel]
+- name: 安装iftop
+  yum:
+    name: /opt/iftop-1.0-0.1.pre2.el6.x86_64.rpm
+    state: present
+- name: 关闭selinux
+  selinux:
+    state: disabled
+- shell: chkconfig --list |egrep "3:on|5:on"|awk '{print $1}'
+  register: service_onboot
+- name: chkconfig off
+  service:
+    name: "{{ item }}"
+    runlevel: 3,5
+    enabled: no
+  with_lines: echo "{{ service_onboot.stdout }}"  #punchline!!!
+  when: service_onboot.stdout != ""
+- name: chkconfig iptables off
+  service:
+    name: iptables
+    state: stopped
+  when: ansible_distribution_major_version == "6"
+- name: 关闭防火墙
+  systemd:
+    name: firewalld
+    state: stopped
+    no_block: yes
+  when: ansible_distribution_major_version == "7"
+- name: chkconfig add
+  service:
+    name: "{{ item }}"
+    runlevel: 3,5
+    enabled: yes
+  with_flattened:
+    - [crond, network, rsyslog, sshd, rpcbind, snmpd, ntpd]
+- name: 修改/etc/fstab
+  replace:
+    path: /etc/fstab
+    regexp: '[0-9]$'
+    replace: '0'
+- name: 修改/etc/inittab
+  replace:
+    path: /etc/inittab
+    regexp: 'id:[^3]'
+    replace: 'id:3'
+- name: 配置snmp
+  replace:
+    path: /etc/snmp/snmpd.conf
+    regexp: "{{ item.attr }}"
+    replace: "{{ item.value }}"
+  with_items:
+    - { attr: '{{ snmp_mib2 }}', value: 'view mib2' }
+    - { attr: '{{ snmp_com2sec }}', value: '127.0.0.1' }
+    - { attr: '{{ snmp_group_access }}', value: '\1mib2\2' }
+- name: 修改/etc/init.d/snmpd
+  replace:
+    path: /etc/init.d/snmpd
+    regexp: '{{ snmpd_options }}'
+    replace: '\1-LS 4 d \2 -a'
+- name: 修改/etc/rc.d/rc.local
+  lineinfile:
+    path: /etc/rc.d/rc.local
+    insertafter: '^\s*$'
+    firstmatch: yes
+    line: 'ulimit -n'
+- name: 修改limits.conf
+  lineinfile:
+    path: /etc/security/limits.conf
+    state: present
+    insertafter: EOF
+    line: '{{ item }}'
+  with_items:
+     - '* soft nofile 65000'
+     - '* hard nofile 65535'
