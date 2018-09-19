@@ -2,6 +2,10 @@
   file:
     path: /var/log
     state: directory
+- name: 创建pbx文件夹
+  file:
+    path: /tmp/pbx
+    state: directory
 - name: 解压nginx相关的
   unarchive:
     src: '{{ item }}'

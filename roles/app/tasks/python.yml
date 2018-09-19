@@ -6,8 +6,6 @@
   copy:
     src: get-pip.py
     dest: /opt
-- shell: cat /proc/cpuinfo | grep "processor" | wc -l
-  register: processors
 - name: 配置python编译参数
   shell: ./configure --prefix=/usr/local
   args:
@@ -15,7 +13,7 @@
 - name: 编译Python-2.7.15
   make:
     chdir: /opt/Python-2.7.15
-    target: --jobs={{ processors.stdout }}
+    target: '--jobs={{ ansible_processor_cores }}'
 - name: 安装Python-2.7.15
   make:
     chdir: /opt/Python-2.7.15
