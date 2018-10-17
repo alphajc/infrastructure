@@ -4,8 +4,7 @@
   register: i686_err
   failed_when: "'NERVERFAILED' in i686_err.stderr"
 - hostname:
-    name: '{{ hostvars[inventory_hostname].hostname }}'
-  when: hostvars[inventory_hostname].hostname is defined
+    name: '{{ inventory_hostname }}'
 - yum:
     name: '{{ item }}'
     state: present

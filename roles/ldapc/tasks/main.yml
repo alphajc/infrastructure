@@ -1,4 +1,22 @@
 ---
+- name: 修改authconfig的python版本
+  lineinfile:
+    path: /usr/bin/yum
+    regexp: '^#!/usr/bin/python'
+    line: '#!/usr/bin/python2.6'
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "6"
+     
+- name: 卸载无用安装包
+  yum:
+    name: "{{ packages }}"
+    state: absent
+  vars:
+    packages:
+    - sssd
+    - sssd-client
+
 - name: 安装nss-pam-ldapd和其它依赖项
   yum:
     name: "{{ packages }}"
@@ -7,12 +25,6 @@
     packages:
     - libselinux-python
     - nss-pam-ldapd
-
-- name: 配置SSH公钥-jerry
-  authorized_key:
-    user: root
-    state: present
-    key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
 
 - name: 修改authconfig的python版本
   lineinfile:

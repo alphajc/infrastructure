@@ -1,0 +1,9 @@
+- hosts: nfs-server
+  roles:
+          - { role: 'indigo-dc.nfs', nfs_mode: 'server', net_mask: '{{ ansible_default_ipv4.network }}/{{ ansible_default_ipv4.netmask }}', nfs_exports: [{path: "/tmp", export: "{{ net_mask | ipaddr('net') }}(fsid=0,rw,async,no_root_squash,no_subtree_check,insecure)"}] }
+
+- hosts: nfs-client
+  roles:
+      - { role: 'indigo-dc.nfs', nfs_mode: 'client', nfs_client_imports: [{ local: "/tmp", remote: "/tmp", server_host: "{{hostvars[groups['nfs-server'][0]]['ansible_default_ipv4']['address']}}" }] }
+  tags:
+      - client
